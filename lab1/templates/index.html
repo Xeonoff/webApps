@@ -1,0 +1,25 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en" class="h-100">
+<head>
+  <meta charset="utf-8">
+    <title>{% block title %}{% endblock %}</title> 
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+</head>
+  
+<body>
+    <ul>
+      <form class = "find-element" action="find" method="get" enctype="multipart/form-data">
+        <br><br>
+        <li><a class="active" href="#home">Выберите получателей</a></li>
+        {% csrf_token %}
+        <li><a href="#news">
+          <input name="search" type="text">
+          <input type="submit" value="🔍">
+        </a></li>
+      </form>
+    </ul> 
+    {% block content %}{% endblock %}
+</body>
+</html>

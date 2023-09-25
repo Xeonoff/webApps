@@ -1,0 +1,26 @@
+{% extends 'index.html' %}
+{%  load static %}
+{% block title %}Отправить файл{% endblock %}
+
+{% block content %}
+<ull>
+    <div class = "card-container">
+        {% for recipient in data.recipients %}
+            <div class="card">
+                <a href="{% url 'recipients_url' recipient.id %}" class = "card-button">
+                    <img src="{% static recipient.img %}" alt="Image">
+                    <h3>{{recipient.title}}, {{recipient.BDate}}</h3>
+                    <p>Эл. почта: {{recipient.email}}</p>
+                    
+                </a>
+                <label class="custom-checkbox">
+                    <input type="checkbox" value="value-1">
+                    <span>Будет отправлено</span>
+                </label>
+            </div>
+        {% empty %}
+            <li>Список пуст</li>
+        {% endfor %}
+    </div>
+</ull>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en" class="h-100">
+<head>
+  <meta charset="utf-8">
+    <title>Информация о получателе</title> 
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="title-text"><h1>{{ data.recipients.title }}</h1></div>
+    <div>
+      <img class = "image" src="{% static data.recipients.img %}" alt="Image">
+      <p class = "title-text">Эл. почта: {{data.recipients.email}}
+        <br>
+        Дата рождения: {{data.recipients.BDate}}<br>
+        Пол: {{data.recipients.sex}}
+      </p>
+    </div>
+</body>
+</html>

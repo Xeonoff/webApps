@@ -1,0 +1,185 @@
+@import url(https://fonts.googleapis.com/css?family=Lora);
+body {
+    background-image: url("/lb1_rip/lab1/static/images/backbody.jpg");
+    background-size: cover;  
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.title-text {
+    text-align: left;
+    font-family: 'Times New Roman', serif;
+    letter-spacing: 1px;
+    margin-left: 5%;
+}
+
+.url-text{
+  text-align: left;
+  font-family: 'Times New Roman', serif;
+  letter-spacing: 1px;
+  font-size: 40px;
+  font-weight: bold;
+  color:#4CAF50;
+  text-decoration: none;
+}
+.image {
+  margin-left: 5%;
+  width: 15%;
+  height: 15%;
+}
+
+
+.title-text h1{
+  font-size: 40px;
+  font-weight: bold;
+  color:coral;
+}
+.title-text p{
+  font-size: 20px;
+  color: black;
+  position: relative;
+  top: -20px;
+}
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.card {
+  width: 20%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.card img {
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+}
+
+.card h3 {
+  margin-top: 10px;
+  color:black;
+}
+
+.card p {
+  margin: 10px 0;
+  color:black
+}
+.find-element {
+  margin-left: 0.5%;
+  position: relative;
+  top: -30px;
+}
+.card-button {
+  /* display: flex; */
+  /* align-items: center; */
+  /* justify-content: center; */
+  width: 10%;
+  text-decoration: none;
+  color: #ffffff;
+  background-color: #333333;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.card-button:hover {
+  background-color: #ffffff;
+}
+ 
+.custom-radio>input {
+  position: absolute;
+  z-index: -1;
+  opacity: 0;
+}
+/* для элемента input c type="checkbox" */
+.custom-checkbox>input {
+  position: absolute;
+  z-index: -1;
+  opacity: 0;
+}
+
+/* для элемента label, связанного с .custom-checkbox */
+.custom-checkbox>span {
+  display: inline-flex;
+  align-items: center;
+  user-select: none;
+}
+
+/* создание в label псевдоэлемента before со следующими стилями */
+.custom-checkbox>span::before {
+  content: '';
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+  flex-grow: 0;
+  border: 1px solid #adb5bd;
+  border-radius: 50%;
+  margin-right: 0.5em;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 50% 50%;
+}
+
+/* стили при наведении курсора на checkbox */
+.custom-checkbox>input:not(:disabled):not(:checked)+span:hover::before {
+  border-color: #76fca9;
+}
+
+/* стили для активного чекбокса (при нажатии на него) */
+.custom-checkbox>input:not(:disabled):active+span::before {
+  background-color: #76fca9;
+  border-color: #76fca9;
+}
+
+/* стили для чекбокса, находящегося в фокусе */
+.custom-checkbox>input:focus+span::before {
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* стили для чекбокса, находящегося в фокусе и не находящегося в состоянии checked */
+.custom-checkbox>input:focus:not(:checked)+span::before {
+  border-color: #1ddf84;
+}
+
+/* стили для чекбокса, находящегося в состоянии checked */
+.custom-checkbox>input:checked+span::before {
+  border-color: #4CAF50;
+  background-color: #4CAF50;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23fff' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26 2.974 7.25 8 2.193z'/%3e%3c/svg%3e");
+}
+
+/* стили для чекбокса, находящегося в состоянии disabled */
+.custom-checkbox>input:disabled+span::before {
+  background-color: #e9ecef;
+}
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+}
+
+li {
+  float: left;
+}
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+li a:hover:not(.active) {
+  background-color: #111;
+}
+
+.active {
+  background-color: #4CAF50;
+}
