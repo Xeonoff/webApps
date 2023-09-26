@@ -7,15 +7,24 @@
     <title>Информация о получателе</title> 
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
 </head>
-<body>
-    <div class="title-text"><h1>{{ data.recipients.title }}</h1></div>
-    <div>
-      <img class = "image" src="{% static data.recipients.img %}" alt="Image">
+<body class = "body-style">
+    <ul>
+      <li><h2><a class="active" href="#home">{{ data.recipients.title }}</a></h2></li>
+    </ul>
+    <br>
+    <div class = "card-container">
+      <div class = "card">
+      <img src="{% static data.recipients.img %}" alt="Image">
       <p class = "title-text">Эл. почта: {{data.recipients.email}}
         <br>
         Дата рождения: {{data.recipients.BDate}}<br>
         Пол: {{data.recipients.sex}}
       </p>
+      <div class = "card_description">
+
+      </div>
     </div>
+  </div>
+    
 </body>
 </html>

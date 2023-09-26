@@ -1,5 +1,9 @@
 @import url(https://fonts.googleapis.com/css?family=Lora);
-body {
+label {
+  position: absolute;
+  bottom: 0;
+}
+.body-style {
     background-image: url("/lb1_rip/lab1/static/images/backbody.jpg");
     background-size: cover;  
     background-position: center;
@@ -9,7 +13,7 @@ body {
     text-align: left;
     font-family: 'Times New Roman', serif;
     letter-spacing: 1px;
-    margin-left: 5%;
+    margin: 5px;
 }
 
 .url-text{
@@ -46,6 +50,14 @@ body {
 
 .card {
   width: 20%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.card_description{
+  width: 70%;
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 10px;
@@ -162,17 +174,19 @@ ul {
   padding: 0;
   overflow: hidden;
   background-color: #333;
+  border-radius: 5%;
 }
 
 li {
   float: left;
+  border-radius: 5px;
 }
 
 li a {
   display: block;
   color: white;
   text-align: center;
-  padding: 14px 16px;
+  /*padding: 14px 16px;*/
   text-decoration: none;
 }
 
