@@ -6,13 +6,13 @@
 <ull>
     <div class = "card-container">
         {% for recipient in data.recipients %}
-            <div class="card">
+            <div class="card" style="background-color: aliceblue; width: 21.5%;">
                 <a href="{% url 'recipients_url' recipient.id %}">
                     <img src="{% static recipient.img %}" alt="Image">
                 </a>
                 <h3>{{recipient.title}}, {{recipient.BDate}}</h3>
                 <p>Эл. почта: {{recipient.email}}</p>
-                <label class="custom-checkbox">
+                <label class="custom-checkbox" style="display: flex; align-items: flex-end;">
                     <input type="checkbox" value="value-1">
                     <span>Будет отправлено</span>
                 </label>
