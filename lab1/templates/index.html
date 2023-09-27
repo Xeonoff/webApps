@@ -9,7 +9,7 @@
 </head>
   
 <body style="background-image: url('/static/images/backbody.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; height: 100%;">
-    <ul style="border-radius: 10px;">
+    <ul style="border-radius: 10px; position: sticky; top: 5px;">
       <form class = "find-element" action="find" method="get" enctype="multipart/form-data">
         <br><br>
         <li><a class="active" href="#home">Выберите получателей</a></li>
@@ -19,6 +19,9 @@
           <input type="submit" value="🔍">
         </a></li>
       </form>
+      <br>
+      <div class="card" style = "width: 160px; height: 10px;">
+      </div>
     </ul> 
     {% block content %}{% endblock %}
     <br><br><br><br><br><br><br><br>
