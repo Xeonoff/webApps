@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
 </head>
   
-<body style="background-image: url('/static/images/backbody.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+<body style="background-image: url('/static/images/backbody.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; height: 100%;">
     <ul style="border-radius: 10px;">
       <form class = "find-element" action="find" method="get" enctype="multipart/form-data">
         <br><br>
@@ -21,5 +21,6 @@
       </form>
     </ul> 
     {% block content %}{% endblock %}
+    <br><br><br><br><br><br><br><br>
 </body>
 </html>

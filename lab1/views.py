@@ -5,10 +5,10 @@ def getdata():
     return {
         'data' : {
             'recipients' : [
-                {'title' : 'Ктотов Ктототам Ктототамович', 'BDate' : '17.09.1992', 'sex' : 'm', 'email' : 'sanitar1992@gmail.com', 'available mem' : '100', 'img' : 'images/1012.jpg', 'id' : 1},
-                {'title' : 'Недопонятый гений', 'BDate' : '11.11.2001', 'sex' : 'f', 'email' : 'paracetamol2001@gmail.com', 'available mem' : '100', 'img' : 'images/rec2316.jpg', 'id' : 2},
-                {'title' : 'Какой-то мужик', 'BDate' : '12.12.2002', 'sex' : 'm', 'email' : 'paralon2002@gmail.com', 'available mem' : '100', 'img' : 'images/recbogdan.jpg', 'id' : 3},
-                {'title' : 'Перега Сират', 'BDate': '21.04.1999', 'sex' : 'm', 'email' : 'eshkere1448@gmail.com', 'available mem' : '100', 'img' : 'images/recpirat.jpg', 'id' : 4},
+                {'title' : 'Анна Ним', 'BDate' : '17.09.1992', 'sex' : 'f', 'email' : 'sanitar1992@gmail.com', 'available_mem' : '100', 'phone' : '+7(915)455-41-51', 'img' : 'images/1012.jpg', 'id' : 1},
+                {'title' : 'Николай Теслин', 'BDate' : '11.11.1975', 'sex' : 'm', 'email' : 'paracetamol2001@gmail.com', 'available_mem' : '100', 'phone' : '+7(915)552-63-97', 'img' : 'images/rec2316.jpg', 'id' : 2},
+                {'title' : 'Александр Фролов', 'BDate' : '12.12.1980', 'sex' : 'm', 'email' : 'paralon2002@gmail.com', 'available_mem' : '100', 'phone' : '+7(915)798-68-85', 'img' : 'images/recbogdan.jpg', 'id' : 3},
+                {'title' : 'Сергей Пиратенко', 'BDate': '21.04.1999', 'sex' : 'm', 'email' : 'seregapirat1448@gmail.com', 'available_mem' : '100', 'phone' : '+7(915)210-21-88', 'img' : 'images/recpirat.jpg', 'id' : 4},
             ]
         }
     }

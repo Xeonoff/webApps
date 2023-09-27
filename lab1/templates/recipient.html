@@ -9,7 +9,7 @@
 </head>
 <body style="background-image: url('/static/images/backbody.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
     <ul style="border-radius: 10px;">
-      <li><h2><a class="active" href="#home">{{ data.recipients.title }}</a></h2></li>
+      <li><h2><a>♟{{ data.recipients.title }}</a></h2></li>
     </ul>
     <br>
     <div class = "card-container">
@@ -17,17 +17,22 @@
       <img src="{% static data.recipients.img %}" alt="Image">
       <p class = "title-text">Эл. почта: {{data.recipients.email}}
         <br>
+        Тел. номер: {{data.recipients.phone}}<br>
         Дата рождения: {{data.recipients.BDate}}<br>
-        Пол: {{data.recipients.sex}}
       </p>
       </div>
       <div class = "card" style="width: 72%; background-color: #333;">
         <p class = "title-text" style="color: aliceblue;">
           Здесь будет какое-то описание<br>
-          Может быть список отправленных файлов, которыми мы поделились с этим получателем
+          Может быть список отправленных файлов, которыми мы поделились с этим получателем<br>
+          Или вообще статусы отправки файлов
         </p>
       </div>
+      <div class = "card" style="width: 96%;">
+        <br>
+        <br>
+        <br>
+      </div>
   </div>
-    
 </body>
 </html>
