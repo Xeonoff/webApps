@@ -1,41 +1,30 @@
 from django.shortcuts import render
-from .models import Card
+from datetime import date
+from django.http import HttpResponse
+from .models import receiver
+from django.db import connection
 
-def getdata():
-    return {
-        'data' : {
-            'recipients' : [
-                {'title' : 'Анна Ним', 'BDate' : '17.09.1992', 'sex' : 'f', 'email' : 'sanitar1992@gmail.com', 'available_mem' : '100', 'phone' : '+7(915)455-41-51', 'img' : 'images/1012.jpg', 'id' : 1},
-                {'title' : 'Николай Теслин', 'BDate' : '11.11.1975', 'sex' : 'm', 'email' : 'paracetamol2001@gmail.com', 'available_mem' : '100', 'phone' : '+7(915)552-63-97', 'img' : 'images/rec2316.jpg', 'id' : 2},
-                {'title' : 'Александр Фролов', 'BDate' : '12.12.1980', 'sex' : 'm', 'email' : 'paralon2002@gmail.com', 'available_mem' : '100', 'phone' : '+7(915)798-68-85', 'img' : 'images/recbogdan.jpg', 'id' : 3},
-                {'title' : 'Сергей Пиратенко', 'BDate': '21.04.1999', 'sex' : 'm', 'email' : 'seregapirat1448@gmail.com', 'available_mem' : '100', 'phone' : '+7(915)210-21-88', 'img' : 'images/recpirat.jpg', 'id' : 4},
-            ]
-        }
-    }
-data = getdata()
-
-def GetParts(request):
-    return render(request, 'recipients.html', data)
+def getdata(request):
+    data = receiver.objects.all()
+    return render(request, 'recipients.html', {'data' : {
+        'recipients': data
+    }})
 
 def GetPart(request, id):
-    data = getdata()
-    result = {}
-    for recipient in data['data']['recipients']:
-        if recipient['id'] == id:
-            result = recipient
+    data = receiver.objects.get(pk = id)
     return render(request, 'recipient.html', {'data' : {
         'id': id,
-        'recipients': result
+        'recipients': data
     }})
 def find(request):
-    data = getdata()
-    res = {'data' : {'recipients' : []}}
+    data = receiver.objects.all()
     try:
-       input = request.GET['search']
+       input = request.GET['receiver']
     except:
-        input = '' 
-    for recipient in data['data']['recipients']:
-        if str(recipient['title']).lower().find(input.lower()) != -1:
-            res['data']['recipients'].append(recipient)
-    return render(request, 'recipients.html', res)
+        input = ''
+    return render(request, 'recipients.html', {'data' : {
+        'recipients' : receiver.objects.filter(full_name__startswith = input),
+        'input' : input,
+        }})
+
 # Create your views here.

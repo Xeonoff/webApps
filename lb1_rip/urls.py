@@ -19,7 +19,7 @@ from django.urls import path
 from lab1 import views
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.GetParts, name = 'index_url'),
+    path('', views.getdata, name = 'index_url'),
     path('recipients/<int:id>/', views.GetPart, name='recipients_url'),
     path('find', views.find),
 ]
