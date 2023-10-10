@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Card
 
 def getdata():
@@ -29,13 +29,16 @@ def GetPart(request, id):
     }})
 def find(request):
     data = getdata()
-    res = {'data' : {'recipients' : []}}
+    res = []
     try:
-       input = request.GET['search']
+       input = request.GET['recipient_sch']
     except:
         input = '' 
     for recipient in data['data']['recipients']:
         if str(recipient['title']).lower().find(input.lower()) != -1:
-            res['data']['recipients'].append(recipient)
-    return render(request, 'recipients.html', res)
+            res.append(recipient)
+    return render(request, 'recipients.html', {'data' : {
+        'input': input,
+        'recipients': res
+    }})
 # Create your views here.

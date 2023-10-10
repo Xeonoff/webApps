@@ -7,9 +7,10 @@
     <title>Информация о получателе</title> 
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
 </head>
-<body style="background-image: url('/static/images/backbody.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+<body style="background-image: url('/static/images/backbody.jpg'); background-size: 100%; background-position: center; background-repeat: no-repeat;">
     <ul style="border-radius: 10px;">
       <li><h2><a>♟{{ data.recipients.title }}</a></h2></li>
+      <li><h2><a href="../../" name="redirect_but" class="active" style="width: 50%;">‹</a></h2></li>
     </ul>
     <br>
     <div class = "card-container">

@@ -8,21 +8,23 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
 </head>
   
-<body style="background-image: url('/static/images/backbody.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; height: 100%;">
+<body style="background-image: url('/static/images/backbody.jpg'); background-size: 100%; background-position: center; background-repeat: no-repeat">
+  <div>
     <ul style="border-radius: 10px; position: sticky; top: 5px;">
-      <form class = "find-element" action="find" method="get" enctype="multipart/form-data">
+      <form class = "find-element" action="" method="get" enctype="multipart/form-data">
         <br><br>
-        <li><a class="active" href="#home">Выберите получателей</a></li>
+        <li><a class="active">Выберите получателей</a></li>
+        <li><a>🔔</a></li>
+        <li><a>Профиль</a></li>
         {% csrf_token %}
-        <li><a href="#news">
-          <input name="search" type="text">
+        <li><a>
+          <input name="recipient_sch" type="text", value="{{data.input}}">
           <input type="submit" value="🔍">
         </a></li>
       </form>
-      <br>
-      <div class="card" style = "width: 160px; height: 10px;">
-      </div>
+      
     </ul> 
+  </div>
     {% block content %}{% endblock %}
     <br><br><br><br><br><br><br><br>
 </body>
