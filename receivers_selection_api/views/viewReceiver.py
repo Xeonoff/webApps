@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from random import *
+import random
 from receivers_selection_api.serializers import *
 from receivers_selection_api.models import *
 from rest_framework.views import APIView
@@ -10,7 +10,7 @@ from .getUserId import *
 from rest_framework.decorators import api_view
 from ..minio.minioClass import MinioClass
 from ..filters import *
-
+count =0
 def getInputId():
     requestlist = sending.objects.filter(user_id = getUserId()).filter(status = 'I')
     if not requestlist.exists():
@@ -26,7 +26,9 @@ def getProductDataWithImage(serializer: receiverSerializer):
 
 def postProductImage(request, serializer: receiverSerializer):
     minio = MinioClass()
-    minio.addImage('images', serializer.data['id'], request.data['image'])
+    image_file = request.FILES.get('image')
+    byte_image = image_file.read()
+    minio.addImage('images', serializer.data['id'], byte_image)
 
 def putProductImage(request, serializer: receiverSerializer):
     minio = MinioClass()
@@ -65,20 +67,19 @@ def procces_receiver_detail(request, pk, format=None):
         SendingId = getInputId()
         if SendingId == -1:   
             Request_new = {}      
-            Request_new['user'] = userId
-            Request_new['moderator'] = random.choice(user.objects.filter(is_moderator=True)).pk
-            sendingserializer = sendingSerializer(data=sending)
+            Request_new['user_id'] = userId
+            Request_new['moder_id'] = random.choice(user.objects.filter(is_moder=True)).pk
+            sendingserializer = sendingSerializer(data=Request_new)
             if sendingserializer.is_valid():
                 sendingserializer.save()  
                 SendingId = sendingserializer.data['id']
             else:
                 return Response(sendingSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            
         link = {}
         link['Receiver'] = pk
         link['Sending'] = SendingId
         link['is_contact'] = False
-        serializer = sendingReceiver(data=link)
+        serializer = sendingReceiverSerializer(data=link)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)

@@ -36,14 +36,13 @@ class MinioClass:
         except Exception as e:
             print("unexpected error: ", e)
 
-    def addImage(self, bucket: str, title: str, image_url: str):
+    def addImage(self, bucket: str, image_id: int, image_base64: str):
         try:
-            response = requests.get(image_url)
-            image_stream = io.BytesIO(response.content)
+            image_stream = BytesIO(image_base64)
             self.client.put_object(bucket_name=bucket,
-                                   object_name=f"{title}.png",
+                                   object_name=f"{image_id}.jpg",
                                    data=image_stream,
-                                   length=len(response.content))
+                                   length=len(image_base64))
         except S3Error as e:
             print("minio error occurred: ", e)
         except Exception as e:
@@ -58,7 +57,7 @@ class MinioClass:
                 expires=timedelta(minutes=1),
                 )
             # print (result)
-            return result
+            return b64encode(BytesIO(result.data).read()).decode()
         except S3Error as e:
             print("minio error occurred: ", e)
         except Exception as e:
@@ -67,15 +66,8 @@ class MinioClass:
     def removeImage(self, bucket: str, title: str):
         try:
             self.client.remove_object(bucket_name=bucket,
-                                      object_name=f"{title}.png")
+                                      object_name=f"{title}.jpg")
         except S3Error as e:
             print("minio error occurred: ", e)
         except Exception as e:
             print("unexpected error: ", e)
-
-    def check_bucket_exists(self, bucket_name):
-        info_bucket = self.client.bucket_exists(bucket_name)
-        if (info_bucket):
-            print(f'[{info_bucket}] Бакет "{bucket_name}" существует')
-        else:
-            print(f'[{info_bucket}] Бакет "{bucket_name}" не существует')
