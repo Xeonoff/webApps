@@ -1,19 +1,3 @@
-"""
-URL configuration for receivers_api project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path
 from django.urls import path, include
@@ -21,18 +5,45 @@ from rest_framework import routers
 from receivers_selection_api.views.viewReceiver import *
 from receivers_selection_api.views.viewSending import *
 from receivers_selection_api.views.viewSendingReceiver import *
+from receivers_selection_api.views.authView import *
+from rest_framework import permissions
+from django.urls import path, include
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
 router = routers.DefaultRouter()
+
+schema_view = get_schema_view(
+   openapi.Info(
+      title="Snippets API",
+      default_version='v1',
+      description="Test description",
+      terms_of_service="https://www.google.com/policies/terms/",
+      contact=openapi.Contact(email="contact@snippets.local"),
+      license=openapi.License(name="BSD License"),
+   ),
+   public=True,
+   permission_classes=(permissions.AllowAny,),
+)
+
+router.register(r'users', UserViewSet, basename='user')
 
 urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
-
-    path(r'receivers/', process_Receiverlist, name='receivers-process'),
-    path(r'receivers/<int:pk>/', procces_receiver_detail, name='receiver-detail-process'),
-
-    path(r'links/', process_MM, name = 'links'),
     
-    path(r'sending/', process_SendingList, name='sending-list-process'),
-    path(r'sending/<int:pk>/', process_sending_detail, name='sending-detail-process'),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+
+    path('accounts/login/', login_view, name='login'),
+    path('accounts/logout/', logout_view, name='logout'),
+    path('accounts/check/', check, name='check'),
+
+    path(r'receivers/', process_Receiverlist.as_view(), name='receivers-process'),
+    path(r'receivers/<int:pk>/', procces_receiver_detail.as_view(), name='receiver-detail-process'),
+
+    path(r'links/', process_MM.as_view(), name = 'links'),
+    
+    path(r'sending/', process_SendingList.as_view(), name='sending-list-process'),
+    path(r'sending/<int:pk>/', process_sending_detail.as_view(), name='sending-detail-process'),
 ]
