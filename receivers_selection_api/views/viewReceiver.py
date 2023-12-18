@@ -6,17 +6,14 @@ import random
 from receivers_selection_api.serializers import *
 from receivers_selection_api.models import *
 from rest_framework.views import APIView
-from .getUserId import *
 from rest_framework.decorators import api_view
 from ..minio.minioClass import MinioClass
 from ..filters import *
-count =0
-def getInputId():
-    requestlist = sending.objects.filter(user_id = getUserId()).filter(status = 'I')
-    if not requestlist.exists():
-        return -1
-    else:
-        return requestlist[0].pk
+from ..permissions import *
+from ..services import *
+from drf_yasg.utils import swagger_auto_schema
+
+session_storage = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT)
     
 def getProductDataWithImage(serializer: receiverSerializer):
     minio = MinioClass()
@@ -35,10 +32,9 @@ def putProductImage(request, serializer: receiverSerializer):
     minio.removeImage('images', serializer.data['id'])
     minio.addImage('images', serializer.data['id'], request.data['image'])
 
-@api_view(['Get', 'Post'])
-def process_Receiverlist(request, format=None):
-    if request.method == 'GET':
-        sendingid = getInputId()
+class process_Receiverlist(APIView):
+    def get(self, request, format=None):
+        sendingid = getSendingID(request)
         List = {
             'SendingId' : sendingid
         }
@@ -47,7 +43,9 @@ def process_Receiverlist(request, format=None):
         List ['Receivers'] = ReceiversData
         return Response(List, status=status.HTTP_202_ACCEPTED)
     
-    elif request.method == 'POST':
+    @method_permission_classes((IsModerator,))
+    @swagger_auto_schema(request_body=receiverSerializer)
+    def post(self, request, format=None):
         serializer = receiverSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -55,19 +53,21 @@ def process_Receiverlist(request, format=None):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['Get', 'Post', 'Put', 'Delete'])
-def procces_receiver_detail(request, pk, format=None):
-    if request.method == 'GET':
+class procces_receiver_detail(APIView):
+    def get(self, pk, format=None):
         Receiver = get_object_or_404(receiver,pk=pk)
         serializer = receiverSerializer(Receiver)
         return Response(getProductDataWithImage(serializer), status=status.HTTP_202_ACCEPTED)
     
-    elif request.method == 'POST': 
-        userId = getUserId()
-        SendingId = getInputId()
+    def post(self, request, pk, format=None):
+        session_id = get_session(request)
+        if session_id is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        userId = user.objects.get(login=session_storage.get(session_id).decode('utf-8'))
+        SendingId = getSendingID(request)
         if SendingId == -1:   
             Request_new = {}      
-            Request_new['user_id'] = userId
+            Request_new['user_id'] = userId.pk
             Request_new['moder_id'] = random.choice(user.objects.filter(is_moder=True)).pk
             sendingserializer = sendingSerializer(data=Request_new)
             if sendingserializer.is_valid():
@@ -85,7 +85,14 @@ def procces_receiver_detail(request, pk, format=None):
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    elif request.method == 'DELETE':
+    def delete(self, request, pk, format=None):
+        session_id = get_session(request)
+        if session_id is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        
+        currentUser = user.objects.get(login=session_storage.get(session_id).decode('utf-8'))
+        if not currentUser.is_moder:
+            return Response(status=status.HTTP_403_FORBIDDEN)
         try: 
             new_status = request.data['status']
         except:
@@ -96,8 +103,16 @@ def procces_receiver_detail(request, pk, format=None):
         Receiver.save()
         serializer = receiverSerializer(Receiver)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-    
-    elif request.method == 'PUT':
+
+    @swagger_auto_schema(request_body=receiverSerializer)
+    def put(self, request, pk, format=None):
+        session_id = get_session(request)
+        if session_id is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        currentUser = user.objects.get(login=session_storage.get(session_id).decode('utf-8'))
+        if not currentUser.is_moder:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
         product = get_object_or_404(receiver, pk=pk)
         fields = request.data.keys()
         if 'id' in fields or 'status' in fields or 'last_modified' in fields:

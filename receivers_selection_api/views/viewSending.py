@@ -1,19 +1,19 @@
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from ..serializers import *
 from ..models import *
 from rest_framework.decorators import api_view
 from datetime import datetime
-from .getUserId import *
 from ..minio.minioClass import MinioClass
 from ..filters import *
-def getInputtingId():
-    requestlist = sending.objects.filter(user_id = getUserId()).filter(status = 'I')
-    if not requestlist.exists():
-        return -1
-    else:
-        return requestlist[0].pk
+from ..permissions import *
+from ..services import *
+from drf_yasg.utils import swagger_auto_schema
+
+session_storage = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT)
+
 def checkStatusUpdate(old, new, isModer):
     return ((not isModer) and (new in ['P', 'D']) and (old == 'I')) or (isModer and (new in ['A', 'W']) and (old == 'P'))
 
@@ -33,24 +33,33 @@ def getSendingPositionsWithReceiverData(serializer: PositionSerializer):
         positions.append(positionData)
     return positions
 
-@api_view(['Get', 'Put', 'Delete'])
-def process_SendingList(request, format=None):
+class process_SendingList(APIView):
 
     # получение списка заказов
-    if request.method == 'GET':
-        application = filterSending(sending.objects.all(), request)
-        serializer = sendingSerializer(application, many=True)
-        wideApplication = serializer.data
-        for i, wa in enumerate(serializer.data):
-            User = get_object_or_404(user, pk=wa['user_id'])
-            Moder = get_object_or_404(user, pk=wa['moder_id'])
-            wideApplication[i]['user_name'] = User.name
-            wideApplication[i]['moder_name'] = Moder.name
-        return Response(wideApplication, status=status.HTTP_202_ACCEPTED)
+    def get(self, request, format=None):
+        session_id = get_session(request)
+        if session_id is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        
+        login1 = session_storage.get(session_id)
+        if login1 is None:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        currentUser = user.objects.get(login=session_storage.get(session_id).decode('utf-8'))
+        if currentUser.is_moder:
+            orders = filterSending(sending.objects.all(), request)
+        else:
+            orders = filterSending(sending.objects.filter(user_id=currentUser.pk), request)
+        serializer = sendingSerializer(orders, many=True)
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
     
     # отправка заказа пользователем
-    elif request.method == 'PUT':
-        application = get_object_or_404(sending, pk=getInputtingId())
+    @swagger_auto_schema(request_body=sendingSerializer)
+    def put(self, request, format=None):
+        session_id = get_session(request)
+        if session_id is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        application = get_object_or_404(sending, pk=getSendingID(request))
         new_status = "P"
         if checkStatusUpdate(application.status, new_status, isModer=False):
             application.status = new_status
@@ -61,45 +70,63 @@ def process_SendingList(request, format=None):
         return Response(status=status.HTTP_400_BAD_REQUEST)
     
     # удаление заказа пользователем
-    elif request.method == 'DELETE':
+    def delete(self, request, format=None):
+        session_id = get_session(request)
+        if session_id is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         new_status = "D"
-        application = get_object_or_404(sending, pk=getInputtingId())
+        application = get_object_or_404(sending, pk=getSendingID(request))
         if checkStatusUpdate(application.status, new_status, isModer=False):
             application.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['Get', 'Put'])
-def process_sending_detail(request, pk, format=None):
+class process_sending_detail(APIView):
 
     # получение заказа
-    if request.method == 'GET':
-        application = get_object_or_404(sending, pk=pk)
-        applicationSerializer = sendingSerializer(application)
+    def get(self, request, pk, format=None):
+        session_id = get_session(request)
+        if session_id is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-        positions = sendingReceiver.objects.filter(Sending=pk)
-        positionsSerializer = PositionSerializer(positions, many=True)
+        currentUser = user.objects.get(login=session_storage.get(session_id).decode('utf-8'))
+        sending_keys = sending.objects.filter(user_id=currentUser.pk).values_list('pk', flat=True)
+        if (pk in sending_keys) or currentUser.is_moder:
+            Sending1 = get_object_or_404(sending, pk=pk)
+            SendingSerializer = sendingSerializer(Sending1)
 
-        response = applicationSerializer.data
-        response['positions'] = getSendingPositionsWithReceiverData(positionsSerializer)
+            positions = sendingReceiver.objects.filter(Sending=pk)
+            positionsSerializer = PositionSerializer(positions, many=True)
 
-        return Response(response, status=status.HTTP_202_ACCEPTED)
+            response = SendingSerializer.data
+            response['positions'] = getSendingPositionsWithReceiverData(positionsSerializer)
+
+            return Response(response, status=status.HTTP_202_ACCEPTED)
+        return Response(status=status.HTTP_403_FORBIDDEN)
     
      # перевод заказа модератором на статус A или W
-    elif request.method == 'PUT':
-        application = get_object_or_404(sending, pk=pk)
+    @swagger_auto_schema(request_body=sendingSerializer)
+    def put(self, request, pk, format=None):
+        session_id = get_session(request)
+        if session_id is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        
+        currentUser = user.objects.get(login=session_storage.get(session_id).decode('utf-8'))
+        if not currentUser.is_moder:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        
+        Sending = get_object_or_404(sending, pk=pk)
         try: 
             new_status = request.data['status']
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        if checkStatusUpdate(application.status, new_status, isModer=True):
-            application.status = new_status
-            application.received = None
-            application.save()
-            wideApplication = sendingSerializer(application).data
-            wideApplication['user_name'] = user.objects.get(pk = wideApplication['user_id']).name
-            wideApplication['moder_name'] = user.objects.get(pk = wideApplication['moder_id']).name
-            return Response(wideApplication, status=status.HTTP_202_ACCEPTED)
+        
+        if checkStatusUpdate(Sending.status, new_status, isModer=True):
+            Sending.status = new_status
+            Sending.received = datetime.now()
+            Sending.save()
+            serializer = sendingSerializer(Sending)
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
     
    
