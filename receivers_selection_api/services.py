@@ -18,8 +18,8 @@ def getSendingID(request):
     if session_id is None:
         return -1
 
-    User = user.objects.get(login=session_storage.get(session_id).decode('utf-8'))
-    sendings = sending.objects.filter(user_id=User).filter(status='I')
+    User = user.objects.get(username=session_storage.get(session_id).decode('utf-8'))
+    sendings = sending.objects.filter(user_name=User).filter(status='I')
     if sendings.exists():
         return sendings.first().pk
     return -1

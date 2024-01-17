@@ -16,7 +16,6 @@ class receiverSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class userSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(required=False)
     is_staff = serializers.BooleanField(default=False, required=False)
     is_moder = serializers.BooleanField(default=False, required=False)
     is_superuser = serializers.BooleanField(default=False, required=False)
@@ -26,19 +25,27 @@ class userSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class UserLoginSerializer(serializers.Serializer):
-    login = serializers.CharField(required=True)
+    username = serializers.CharField(required=True)
     password = serializers.CharField(required=True)
 
 class sendingSerializer(serializers.ModelSerializer):
+    username = serializers.SerializerMethodField()
+    modername = serializers.SerializerMethodField()
+
     def get_fields(self):
         new_fields = OrderedDict()
         for name, field in super().get_fields().items():
             field.required = False
             new_fields[name] = field
         return new_fields
+    def get_username(self, obj):
+        return obj.user_name.username
+    
+    def get_modername(self, obj):
+        return obj.moder_name.username
     class Meta:
         model = sending
-        fields = '__all__'
+        fields = ["id","created", "sent", "received","status_send","status", "username", "modername"]
 
 class sendingReceiverSerializer(serializers.ModelSerializer):
     def get_fields(self):

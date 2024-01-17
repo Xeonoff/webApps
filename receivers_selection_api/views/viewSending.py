@@ -11,7 +11,7 @@ from ..filters import *
 from ..permissions import *
 from ..services import *
 from drf_yasg.utils import swagger_auto_schema
-
+import requests
 session_storage = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT)
 
 def checkStatusUpdate(old, new, isModer):
@@ -20,10 +20,8 @@ def checkStatusUpdate(old, new, isModer):
 def getReceiverInSendingWithImage(serializer: receiverSerializer):
     minio = MinioClass()
     receiverData = serializer.data
-    receiverData['img'] = minio.getImage('images', serializer.data['id'])
+    receiverData.update({'img': minio.getImage('images', serializer.data['id'])})
     return receiverData
-
-# добавляет данные продукта ко всем позициям заказа
 def getSendingPositionsWithReceiverData(serializer: PositionSerializer):
     positions = []
     for item in serializer.data:
@@ -33,6 +31,32 @@ def getSendingPositionsWithReceiverData(serializer: PositionSerializer):
         positions.append(positionData)
     return positions
 
+class Current_Inp_View(APIView):
+    @swagger_auto_schema(operation_description="Данный метод возвращает черновую заявку. Доступ: только если авторизован.")
+    def get(self, request, format=None):
+        session_id = get_session(request)
+        if session_id is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        
+        username = session_storage.get(session_id)
+        if username is None:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        currentUser = user.objects.get(username=session_storage.get(session_id).decode('utf-8'))
+        request_current = sending.objects.filter(user_name=currentUser).filter(status='I')
+        if request_current.exists():
+            application = request_current.first()
+            requestserializer = sendingSerializer(application)
+
+            positions = sendingReceiver.objects.filter(Sending=application.pk)
+            positionsSerializer = PositionSerializer(positions, many=True)
+
+            response = requestserializer.data
+            response['positions'] = getSendingPositionsWithReceiverData(positionsSerializer)
+
+            return Response(response, status=status.HTTP_202_ACCEPTED)
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
 class process_SendingList(APIView):
 
     # получение списка заказов
@@ -45,11 +69,11 @@ class process_SendingList(APIView):
         if login1 is None:
             return Response(status=status.HTTP_403_FORBIDDEN)
 
-        currentUser = user.objects.get(login=session_storage.get(session_id).decode('utf-8'))
+        currentUser = user.objects.get(username=session_storage.get(session_id).decode('utf-8'))
         if currentUser.is_moder:
             orders = filterSending(sending.objects.all(), request)
         else:
-            orders = filterSending(sending.objects.filter(user_id=currentUser.pk), request)
+            orders = filterSending(sending.objects.filter(user_name=currentUser.pk), request)
         serializer = sendingSerializer(orders, many=True)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
     
@@ -62,6 +86,9 @@ class process_SendingList(APIView):
         application = get_object_or_404(sending, pk=getSendingID(request))
         new_status = "P"
         if checkStatusUpdate(application.status, new_status, isModer=False):
+            url = "http://localhost:8080/send/"
+            params = {"id_sending": str(application.pk)}
+            response = requests.post(url, json=params)
             application.status = new_status
             application.sent = datetime.now()
             application.save()
@@ -89,8 +116,8 @@ class process_sending_detail(APIView):
         if session_id is None:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-        currentUser = user.objects.get(login=session_storage.get(session_id).decode('utf-8'))
-        sending_keys = sending.objects.filter(user_id=currentUser.pk).values_list('pk', flat=True)
+        currentUser = user.objects.get(username=session_storage.get(session_id).decode('utf-8'))
+        sending_keys = sending.objects.filter(user_name=currentUser).values_list('pk', flat=True)
         if (pk in sending_keys) or currentUser.is_moder:
             Sending1 = get_object_or_404(sending, pk=pk)
             SendingSerializer = sendingSerializer(Sending1)
@@ -111,7 +138,7 @@ class process_sending_detail(APIView):
         if session_id is None:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         
-        currentUser = user.objects.get(login=session_storage.get(session_id).decode('utf-8'))
+        currentUser = user.objects.get(username=session_storage.get(session_id).decode('utf-8'))
         if not currentUser.is_moder:
             return Response(status=status.HTTP_403_FORBIDDEN)
         

@@ -23,16 +23,14 @@ class process_MM(APIView):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         try: 
-            cnt = request.data['Reciver_count']
+            isContact = request.data["is_contact"]
             productId = request.data['Receiver']
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        if receiver.objects.get(pk=productId).cnt < cnt:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
         links = sendingReceiver.objects.filter(Receiver=productId).filter(Sending=getSendingID(request))
         if len(links) > 0:
-            links[0].Reciver_count = cnt
+            links[0].is_contact = isContact
             links[0].save()
             return Response(PositionSerializer(links[0]).data, status=status.HTTP_204_NO_CONTENT)
         return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -49,7 +47,7 @@ class process_MM(APIView):
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         
-        sendingID = getSendingID()
+        sendingID = getSendingID(request)
         links = sendingReceiver.objects.filter(Receiver=productId).filter(Sending=sendingID)
         if len(links) > 0:
             links[0].delete()

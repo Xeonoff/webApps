@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    "corsheaders",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -144,3 +146,6 @@ REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 
 AUTH_USER_MODEL = 'receivers_selection_api.User'
+
+from django.core.servers.basehttp import WSGIServer
+WSGIServer.handle_error = lambda *args, **kwargs: None

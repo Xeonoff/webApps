@@ -2,9 +2,13 @@ def filterStatus(queryset, request):
     if request.query_params.get('status'):
         return queryset.filter(status=request.query_params.get('status'))
     return queryset
+def filterSendingStatus(queryset, request):
+    if request.query_params.get('status'):
+        return queryset.filter(status__in=list(request.query_params.get('status')))
+    return queryset
 def filterTitle(queryset,request):
-    if request.query_params.get('full_name'):
-        return queryset.filter(full_name__startswith = request.query_params.get('full_name'))
+    if request.query_params.get('title'):
+        return queryset.filter(full_name__startswith = request.query_params.get('title'))
     return queryset
 def filterUser(queryset, request):
     if request.query_params.get('user_id'):
@@ -28,7 +32,7 @@ def filterModerator(queryset, request):
     return queryset
 
 def filterReceiver(queryset, request):
-    return filterTitle(queryset.filter(status=1), request)
+    return filterTitle(filterStatus(queryset, request), request)
 
 def filterSending(queryset, request):
-    return DateFilter(filterStatus(queryset, request), request)
+    return DateFilter(filterSendingStatus(queryset, request), request)

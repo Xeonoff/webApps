@@ -21,7 +21,7 @@ class IsModerator(BasePermission):
             return False
         
         if session_storage.get(ssid):
-            User = user.objects.get(login=session_storage.get(ssid).decode('utf-8'))
+            User = user.objects.get(username=session_storage.get(ssid).decode('utf-8'))
             return User.is_moder or User.is_superuser
         return False
 
@@ -38,7 +38,7 @@ class IsAdmin(BasePermission):
             return False
         
         if session_storage.get(ssid):
-            User = user.objects.get(login=session_storage.get(ssid).decode('utf-8'))
+            User = user.objects.get(username=session_storage.get(ssid).decode('utf-8'))
             return User.is_superuser
         return False
     
@@ -55,7 +55,7 @@ class IsAuthenticated(BasePermission):
             return False
 
         if session_storage.get(ssid):
-            User = user.objects.get(login=session_storage.get(ssid).decode('utf-8'))
+            User = user.objects.get(username=session_storage.get(ssid).decode('utf-8'))
             return User.is_active
 
         return False

@@ -39,13 +39,13 @@ class UserViewSet(ModelViewSet):
     def create(self, request):
         """
         Функция регистрации новых пользователей
-        Если пользователя c указанным в request login ещё нет, в БД будет добавлен новый пользователь.
+        Если пользователя c указанным в request username ещё нет, в БД будет добавлен новый пользователь.
         """
-        if self.model_class.objects.filter(login=request.data['login']).exists():
+        if self.model_class.objects.filter(username=request.data['username']).exists():
             return Response({'status': 'Exist'}, status=400)
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            self.model_class.objects.create_user(login=serializer.data['login'],
+            self.model_class.objects.create_user(username=serializer.data['username'],
                                      password=serializer.data['password'],
                                      is_superuser=serializer.data['is_superuser'],
                                      is_staff=serializer.data['is_staff'],
@@ -60,7 +60,7 @@ def check(request):
     session_id = request.headers.get("authorization")
 
     if session_storage.get(session_id):
-        User = user.objects.get(login=session_storage.get(session_id).decode('utf-8'))
+        User = user.objects.get(username=session_storage.get(session_id).decode('utf-8'))
         serializer = userSerializer(User, many=False)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -71,18 +71,18 @@ def check(request):
 @api_view(['Post'])
 @permission_classes([AllowAny])
 def login_view(request):
-    login = request.data["login"]
+    username = request.data["username"]
     password = request.data["password"]
-    User: user = authenticate(request, login=login, password=password)
+    User: user = authenticate(request, username=username, password=password)
 
     if User is not None:
         random_key = str(uuid.uuid4())
-        session_storage.set(random_key, login)
+        session_storage.set(random_key, username)
 
         data = {
             "session_id": random_key,
             "user_id": User.pk,
-            "login": User.login,
+            "username": User.username,
             "is_moderator": User.is_moder
         }
 
@@ -90,7 +90,10 @@ def login_view(request):
         response.set_cookie("session_id", random_key, httponly=False, expires=timedelta(days=1))
         return response
     else:
-        return HttpResponse(status=status.HTTP_403_FORBIDDEN)
+        data ={
+            "илья ты даун ебанный сколько можно уже"
+        }
+        return HttpResponse(data, status=status.HTTP_403_FORBIDDEN)
 
 
 @swagger_auto_schema(method='post')
