@@ -129,7 +129,7 @@ class procces_receiver_detail(APIView):
         serializer = receiverSerializer(product, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            if 'img' in fields:
+            if 'img' in fields and fields.mapping['img'] != '':
                 putProductImage(request, serializer)
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

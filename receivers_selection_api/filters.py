@@ -18,12 +18,12 @@ def filterUser(queryset, request):
 def DateFilter(objects, request):
     lowerdate = "2020-01-01"
     higherdate = "2500-01-01"
-    if request.query_params.get('created'):
-        return objects.filter(created__date = request.query_params.get('created'))
-    if request.query_params.get('downdate'):
-        lowerdate = request.query_params.get('downdate')
-    if request.query_params.get('upperdate'):
-        higherdate = request.query_params.get('upperdate')
+    if request.query_params.get('send'):
+        return objects.filter(created__date = request.query_params.get('send'))
+    if request.query_params.get('start_date'):
+        lowerdate = request.query_params.get('start_date')
+    if request.query_params.get('end_date'):
+        higherdate = request.query_params.get('end_date')
     return objects.filter(created__range=[lowerdate, higherdate])
 
 def filterModerator(queryset, request):

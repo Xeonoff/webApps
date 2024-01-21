@@ -31,31 +31,6 @@ def getSendingPositionsWithReceiverData(serializer: PositionSerializer):
         positions.append(positionData)
     return positions
 
-class Current_Inp_View(APIView):
-    @swagger_auto_schema(operation_description="Данный метод возвращает черновую заявку. Доступ: только если авторизован.")
-    def get(self, request, format=None):
-        session_id = get_session(request)
-        if session_id is None:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
-        
-        username = session_storage.get(session_id)
-        if username is None:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-
-        currentUser = user.objects.get(username=session_storage.get(session_id).decode('utf-8'))
-        request_current = sending.objects.filter(user_name=currentUser).filter(status='I')
-        if request_current.exists():
-            application = request_current.first()
-            requestserializer = sendingSerializer(application)
-
-            positions = sendingReceiver.objects.filter(Sending=application.pk)
-            positionsSerializer = PositionSerializer(positions, many=True)
-
-            response = requestserializer.data
-            response['positions'] = getSendingPositionsWithReceiverData(positionsSerializer)
-
-            return Response(response, status=status.HTTP_202_ACCEPTED)
-        return Response(status=status.HTTP_404_NOT_FOUND)
     
 class process_SendingList(APIView):
 

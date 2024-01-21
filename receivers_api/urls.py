@@ -47,6 +47,5 @@ urlpatterns = [
     path(r'links/', process_MM.as_view(), name = 'links'),
     
     path(r'sending/', process_SendingList.as_view(), name='sending-list-process'),
-    path(r'sending/current/', Current_Inp_View.as_view(), name='request-current'),
     path(r'sending/<int:pk>/', process_sending_detail.as_view(), name='sending-detail-process'),
 ]
