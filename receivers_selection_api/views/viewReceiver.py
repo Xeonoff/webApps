@@ -74,7 +74,6 @@ class procces_receiver_detail(APIView):
         if SendingId == -1:   # если его нету
             request_new = sending.objects.create(
                 user_name=username,
-                moder_name=random.choice(user.objects.filter(is_moder=True))
             )
             SendingId = request_new.pk
             

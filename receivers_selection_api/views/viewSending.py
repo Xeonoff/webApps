@@ -120,6 +120,7 @@ class process_sending_detail(APIView):
         Sending = get_object_or_404(sending, pk=pk)
         try: 
             new_status = request.data['status']
+            Sending.moder_name = currentUser
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         

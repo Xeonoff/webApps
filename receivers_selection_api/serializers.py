@@ -42,7 +42,10 @@ class sendingSerializer(serializers.ModelSerializer):
         return obj.user_name.username
     
     def get_modername(self, obj):
-        return obj.moder_name.username
+        try:
+            return obj.moder_name.username
+        except:
+            return ""
     class Meta:
         model = sending
         fields = ["id","created", "sent", "received","status_send","status", "username", "modername"]

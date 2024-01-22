@@ -46,7 +46,7 @@ class sending(models.Model):
     status = models.CharField(max_length=20, verbose_name="Статус", default='I') # I - inputing, P - processing, D - deleted by user, A - success, W - fail
     status_send = models.CharField(max_length=20, verbose_name="Статус отправки", default='Q')# Q - in queue, A - accepted, D - delivered, R - received
     user_name = models.ForeignKey(user, on_delete = models.CASCADE, verbose_name="ID_Пользователь", related_name='user_name')
-    moder_name = models.ForeignKey(user, on_delete = models.CASCADE, verbose_name="ID_Модератор", related_name='moder_name')
+    moder_name = models.ForeignKey(user, on_delete = models.CASCADE, verbose_name="ID_Модератор", related_name='moder_name', null = True)
 
 class sendingReceiver(models.Model):
     is_contact = models.BooleanField(verbose_name="ваш контакт?", default=False)
