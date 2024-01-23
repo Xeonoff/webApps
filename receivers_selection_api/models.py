@@ -45,14 +45,14 @@ class sending(models.Model):
     received = models.DateTimeField(verbose_name="Получен", null = True, blank = True)
     status = models.CharField(max_length=20, verbose_name="Статус", default='I') # I - inputing, P - processing, D - deleted by user, A - success, W - fail
     status_send = models.CharField(max_length=20, verbose_name="Статус отправки", default='Q')# Q - in queue, A - accepted, D - delivered, R - received
-    user_name = models.ForeignKey(user, on_delete = models.CASCADE, verbose_name="ID_Пользователь", related_name='user_name')
-    moder_name = models.ForeignKey(user, on_delete = models.CASCADE, verbose_name="ID_Модератор", related_name='moder_name', null = True)
+    user_name = models.ForeignKey(user, on_delete = models.PROTECT, verbose_name="ID_Пользователь", related_name='user_name')
+    moder_name = models.ForeignKey(user, on_delete = models.PROTECT, verbose_name="ID_Модератор", related_name='moder_name', null = True)
 
 class sendingReceiver(models.Model):
     is_contact = models.BooleanField(verbose_name="ваш контакт?", default=False)
     Reciver_count = models.IntegerField(verbose_name="Количество получателей в данном запросе", default = 0)
-    Receiver = models.ForeignKey(receiver, on_delete = models.CASCADE, verbose_name="Получатель")
-    Sending = models.ForeignKey(sending, on_delete = models.CASCADE, verbose_name="Отправка файла")
+    Receiver = models.ForeignKey(receiver, on_delete = models.PROTECT, verbose_name="Получатель")
+    Sending = models.ForeignKey(sending, on_delete = models.PROTECT, verbose_name="Отправка файла")
     class Meta:
         unique_together = (('Receiver', 'Sending'),)
 # Create your models here.
